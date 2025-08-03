@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:wght@400;700&family=Exo+2:wght@700&display=swap" rel="stylesheet">
     <style>
         /* CSS Variables for Theming */
         :root {
@@ -51,6 +51,10 @@
         
         html.dark body {
              background-image: url('https://placehold.co/1920x1080/0f172a/1e293b?text=PrAI');
+        }
+
+        .font-logo {
+            font-family: 'Exo 2', sans-serif;
         }
 
         #simple-ipa-text, #detailed-ipa-text, .phoneme, .ipa-text {
@@ -144,9 +148,6 @@
         .slide-up { animation: slideUp 0.5s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
-        .floating { animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        
         .input-focus { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .input-focus:focus { transform: scale(1.02); box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2); }
         
@@ -181,8 +182,7 @@
     <div class="w-full max-w-3xl mx-auto">
         <!-- Header Section -->
         <header class="text-center mb-8 fade-in relative">
-            <h1 class="text-5xl md:text-6xl font-bold gradient-text mb-4 floating">PrAI</h1>
-            <p class="text-xl text-secondary mb-2">Chinh phục mọi âm tiết, tự tin trong từng cuộc thoại.</p>
+            <h1 class="text-6xl md:text-7xl font-bold gradient-text mb-4 font-logo">PrAI</h1>
             <button id="theme-toggle" class="absolute top-0 right-0 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-secondary">
                 <svg id="theme-icon-light" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
@@ -195,7 +195,8 @@
             <section class="space-y-4">
                 <div>
                     <label for="text-input" class="block text-lg font-semibold text-primary mb-3">Nhập từ, cụm từ hoặc câu:</label>
-                    <textarea id="text-input" rows="3" class="w-full glass-effect p-4 bg-input-bg border-border-color rounded-xl text-primary placeholder-text-secondary focus:ring-2 focus:ring-blue-500 transition-all input-focus resize-none" placeholder="Ví dụ: an apple, what are you doing..."></textarea>
+                    <textarea id="text-input" rows="3" maxlength="250" class="w-full glass-effect p-4 bg-input-bg border-border-color rounded-xl text-primary placeholder-text-secondary focus:ring-2 focus:ring-blue-500 transition-all input-focus resize-none" placeholder="Ví dụ: an apple, what are you doing..."></textarea>
+                    <div id="char-counter" class="text-right text-sm text-secondary mt-1">0 / 250</div>
                     <div class="mt-4 flex flex-col md:flex-row md:items-center gap-4">
                         <div class="flex-grow">
                             <label for="accent-select" class="block text-sm font-medium text-secondary mb-1">Chọn giọng:</label>
@@ -221,23 +222,30 @@
             
             <!-- IPA & Controls Section -->
             <section id="controls-section" class="hidden space-y-6">
-                 <div id="ipa-display" class="space-y-3">
-                    <div>
-                        <h3 class="font-semibold text-secondary text-md">Phiên âm cơ bản (IPA):</h3>
-                        <p id="simple-ipa-text" class="text-xl text-primary bg-input-bg p-3 rounded-lg min-h-[44px] tracking-wider border border-border-color"></p>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-teal-500 dark:text-teal-400 text-md">Phiên âm tự nhiên (chuẩn):</h3>
-                        <p id="detailed-ipa-text" class="text-2xl text-teal-600 dark:text-teal-300 bg-teal-500/10 p-4 rounded-lg min-h-[48px] tracking-wider border border-teal-500/20"></p>
-                    </div>
-                </div>
+                 <div class="space-y-3">
+                     <div class="flex items-end gap-3">
+                         <div class="flex-grow">
+                             <h3 class="font-semibold text-secondary text-md mb-1">Phiên âm cơ bản</h3>
+                             <p id="simple-ipa-text" class="text-lg text-primary bg-input-bg p-3 rounded-lg flex items-center tracking-wider border border-border-color"></p>
+                         </div>
+                         <button id="listen-clear-btn" class="btn btn-primary w-14 flex-shrink-0 rounded-xl flex items-center justify-center shadow-lg py-3">
+                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+                             <div class="btn-spinner hidden h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                         </button>
+                     </div>
+                     <div class="flex items-end gap-3">
+                         <div class="flex-grow">
+                             <h3 class="font-semibold text-teal-500 dark:text-teal-400 text-md mb-1">Phiên âm tự nhiên</h3>
+                             <p id="detailed-ipa-text" class="text-xl text-teal-600 dark:text-teal-300 bg-teal-500/10 p-3 rounded-lg flex items-center tracking-wider border border-teal-500/20"></p>
+                         </div>
+                          <button id="listen-natural-btn" class="btn btn-primary w-14 flex-shrink-0 rounded-xl flex items-center justify-center shadow-lg py-3">
+                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                             <div class="btn-spinner hidden h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                         </button>
+                     </div>
+                 </div>
 
-                <div class="grid grid-cols-3 gap-3">
-                     <button id="listen-btn" class="btn btn-primary font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                        <span class="text">Nghe</span>
-                        <div class="btn-spinner hidden h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
-                    </button>
+                <div class="grid grid-cols-2 gap-3">
                     <button id="record-btn" class="btn btn-danger font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
                         <span class="text">Ghi âm</span>
@@ -320,7 +328,8 @@
         const textInput = document.getElementById('text-input');
         const accentSelect = document.getElementById('accent-select');
         const transcribeBtn = document.getElementById('transcribe-btn');
-        const listenBtn = document.getElementById('listen-btn');
+        const listenNaturalBtn = document.getElementById('listen-natural-btn');
+        const listenClearBtn = document.getElementById('listen-clear-btn');
         const recordBtn = document.getElementById('record-btn');
         const listenAgainBtn = document.getElementById('listen-again-btn');
         const randomPracticeBtn = document.getElementById('random-practice-btn');
@@ -349,6 +358,7 @@
         const themeIconLight = document.getElementById('theme-icon-light');
         const themeIconDark = document.getElementById('theme-icon-dark');
         const progressText = document.getElementById('progress-text');
+        const charCounter = document.getElementById('char-counter');
 
         // State variables
         let isRecording = false;
@@ -362,9 +372,12 @@
         let lastRecordingBlob = null;
         let soundDetected = false;
         let ipaLoadingInterval;
-        let lastTTSAudio = null;
-        let lastTTSText = '';
-        let lastTTSAccent = '';
+        let lastTTSAudioNatural = null;
+        let lastTTSTextNatural = '';
+        let lastTTSAccentNatural = '';
+        let lastTTSAudioClear = null;
+        let lastTTSTextClear = '';
+        let lastTTSAccentClear = '';
         let fetchIpaRequestID = 0; // To manage concurrent IPA fetch requests
         let progressInterval;
         
@@ -411,7 +424,7 @@
         ];
 
         // API Configuration - Replace with your own API key if running outside the original environment.
-        const apiKey = "AIzaSyBa0ieUPwXxb-W_fFHbB-ldEJG8-sAFxN0"; 
+        const apiKey = ""; 
         const TEXT_MODEL = "gemini-2.5-flash-preview-05-20";
         const TTS_MODEL = "gemini-2.5-flash-preview-tts";
         const TEXT_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent?key=${apiKey}`;
@@ -508,8 +521,8 @@
                      const response = await fetch(url, options);
                      if (response.status === 429 || response.status >= 500) {
                          if (i === maxRetries - 1) {
-                            const errorBody = await response.json().catch(() => ({}));
-                            throw new Error(`API Error: ${response.status}. ${errorBody.error?.message || 'Server error after multiple retries.'}`);
+                             const errorBody = await response.json().catch(() => ({}));
+                             throw new Error(`API Error: ${response.status}. ${errorBody.error?.message || 'Server error after multiple retries.'}`);
                          }
                          await new Promise(resolve => setTimeout(resolve, delay));
                          delay *= 2; 
@@ -609,7 +622,7 @@
             }
         }
 
-        async function handleListen() {
+        async function handleListen(type, button) {
             const text = textInput.value.trim();
             const accent = accentSelect.value;
             if (!text) {
@@ -617,18 +630,28 @@
                 return;
             }
             
-            if (lastTTSAudio && lastTTSText === text && lastTTSAccent === accent) {
-                lastTTSAudio.play();
+            // Check cache
+            const isNatural = type === 'natural';
+            const cachedAudio = isNatural ? lastTTSAudioNatural : lastTTSAudioClear;
+            const cachedText = isNatural ? lastTTSTextNatural : lastTTSTextClear;
+            const cachedAccent = isNatural ? lastTTSAccentNatural : lastTTSAccentClear;
+
+            if (cachedAudio && cachedText === text && cachedAccent === accent) {
+                cachedAudio.play();
                 return;
             }
 
             const ipaFetched = await fetchAndDisplayIPA();
             if (!ipaFetched) return;
 
-            setButtonLoading(listenBtn, true);
+            setButtonLoading(button, true);
             try {
+                const prompt = isNatural 
+                    ? `Say clearly in ${accent}: ${text}` 
+                    : `Say very clearly, with only a slight pause between each word, in ${accent}: ${text}`;
+
                 const payload = {
-                    contents: [{ parts: [{ text: `Say clearly in ${accent}: ${text}` }] }],
+                    contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: { responseModalities: ["AUDIO"] },
                     model: TTS_MODEL
                 };
@@ -652,16 +675,23 @@
                     const audio = new Audio(audioUrl);
                     audio.play();
 
-                    lastTTSAudio = audio;
-                    lastTTSText = text;
-                    lastTTSAccent = accent;
+                    // Store in cache
+                    if(isNatural) {
+                        lastTTSAudioNatural = audio;
+                        lastTTSTextNatural = text;
+                        lastTTSAccentNatural = accent;
+                    } else {
+                        lastTTSAudioClear = audio;
+                        lastTTSTextClear = text;
+                        lastTTSAccentClear = accent;
+                    }
                 } else {
                     throw new Error("Không nhận được dữ liệu âm thanh hợp lệ.");
                 }
             } catch (error) {
                 handleApiError(error);
             } finally {
-                setButtonLoading(listenBtn, false);
+                setButtonLoading(button, false);
             }
         }
         
@@ -675,19 +705,13 @@
             clearInterval(progressInterval);
 
             progressInterval = setInterval(() => {
-                if (width < 70) {
-                    width += Math.random() * 5;
-                } else if (width < 95) {
-                    width += Math.random() * 1;
-                }
-                
-                if (width >= 95) {
-                    width = 95;
+                if (width < 95) {
+                    width += Math.random() * 2;
+                } else {
                     clearInterval(progressInterval);
                 }
-                
-                progressBarInner.style.width = width + '%';
-            }, 200);
+                progressBarInner.style.width = Math.min(width, 95) + '%';
+            }, 100);
         }
 
         function stopProgressSimulation() {
@@ -726,32 +750,33 @@
                 const base64Audio = reader.result.split(',')[1];
                 const isSentence = textInput.value.trim().includes(' ');
                 
+                // --- AI PROMPT ENHANCEMENT ---
+                // This prompt is now informed by the user-provided documents.
                 const prompt = {
                     "role": "You are PrAI, a world-class phonetician specializing in American (AmE) and British (BrE) English, acting as an encouraging tutor for Vietnamese learners.",
-                    "knowledge_base": ["Phát Âm Chuẩn Tiếng Anh-Anh và Anh-Mỹ trong Thế Kỷ 21 (user-provided document)."],
+                    "knowledge_base": [
+                        "Phát Âm Chuẩn Tiếng Anh-Anh và Anh-Mỹ trong Thế Kỷ 21 (user-provided document).",
+                        "Shaping Learners’ Pronunciation: Teaching the Connected Speech of North American English (user-provided document).",
+                        "English Phonetics and Pronunciation Practice (user-provided document).",
+                        "Oxford BBC Guide To Pronunciation (user-provided document).",
+                        "English Pronunciation Instruction: Research-based insights (user-provided document)."
+                    ],
                     "context": {
                         "text_to_pronounce": textInput.value.trim(),
                         "target_accent": accentSelect.value === 'American English' ? 'AmE' : 'BrE',
                         "standard_ipa": standardIPA,
                         "is_sentence": isSentence,
                         "phonetic_guidelines": {
-                            "instruction": "Your analysis MUST strictly adhere to the phonetic norms of the 'target_accent' as detailed in the user-provided document. Your feedback must be gentle, encouraging, detailed, positive, and constructive.",
-                            "ame_rules": [
-                                "Accept T-Flapping [ɾ] as correct (e.g., 'water').",
-                                "Enforce full Rhoticity (pronounce all /r/s).",
-                                "Accept the Cot-Caught merger (/ɑ/ for both) as correct and modern.",
-                                "Enforce Yod-Dropping after alveolar consonants (e.g., 'new' is /nu/)."
-                            ],
-                            "bre_rules": [
-                                "Enforce Non-Rhoticity (only pronounce /r/ before a vowel).",
-                                "Enforce the TRAP-BATH split (/æ/ vs /ɑː/).",
-                                "Accept modern features: CURE-THOUGHT merger (/ɔː/), HappY-tensing (/iː/), moderate T-glottalization (word-final), and L-vocalization (e.g., 'hill' as [hɪo])."
+                            "instruction": "Your analysis MUST strictly adhere to the phonetic norms of the 'target_accent' as detailed in the user-provided documents. Your feedback must be gentle, encouraging, detailed, positive, and constructive. It must be scientifically rigorous and natural-sounding.",
+                            "vietnamese_learner_focus": [
+                                "Pay special attention to common Vietnamese L1 interference patterns: final consonant deletion (e.g., 'nice' -> /naɪ/), incorrect vowel length, and difficulty with consonant clusters.",
+                                "Analyze connected speech phenomena (assimilation, elision, linking) based on the 'Shaping Learners' Pronunciation' document."
                             ]
                         }
                     },
-                    "task": `First, determine if the audio contains discernible English speech. If not, set 'speech_detected' to false and return immediately. If speech is detected, perform a scientifically rigorous analysis based on the 'phonetic_guidelines'.
+                    "task": `First, determine if the audio contains discernible English speech. If not, set 'speech_detected' to false and return immediately. If speech is detected, perform a scientifically rigorous analysis based on the 'phonetic_guidelines' and your extensive 'knowledge_base'.
                     1.  **Scoring:** Provide an 'overall_score' (0-100) based on phonetic proximity to a native speaker of the 'target_accent'. Do NOT penalize correct accent-specific variations.
-                    2.  **Analysis & Feedback:** Analyze phonemes, stress, etc. Adopt a gentle and encouraging tone. Explain errors by referencing L1 interference (e.g., "Đây là một lỗi phổ biến vì âm cuối này không có trong tiếng Việt..."). Prioritize feedback based on impact on intelligibility: 1. Final Consonants, 2. Sentence Rhythm, 3. Key Consonants (/θ, ð/), 4. Vowels.
+                    2.  **Analysis & Feedback:** Analyze phonemes, stress, connected speech, and intonation. Adopt a gentle and encouraging tone. Explain errors by referencing L1 interference (e.g., "Đây là một lỗi phổ biến của người Việt vì âm cuối /s/ thường không được phát âm..."). Prioritize feedback based on impact on intelligibility: 1. Final Consonants, 2. Sentence Rhythm & Connected Speech, 3. Key Consonants (/θ, ð, ʃ, ʒ/), 4. Vowels.
                     Return the result in the specified JSON format.`,
                     "output_format_instruction": {
                         "format": "JSON",
@@ -893,9 +918,12 @@
             ipaForText = '';
             controlsSection.classList.add('hidden');
             resetAnalysisOnly();
-            lastTTSAudio = null;
-            lastTTSText = '';
-            lastTTSAccent = '';
+            lastTTSAudioNatural = null;
+            lastTTSTextNatural = '';
+            lastTTSAccentNatural = '';
+            lastTTSAudioClear = null;
+            lastTTSTextClear = '';
+            lastTTSAccentClear = '';
         }
         
         async function handleRecord() {
@@ -1013,6 +1041,7 @@
         function handleRandomPractice() {
             const randomSentence = practiceSentences[Math.floor(Math.random() * practiceSentences.length)];
             textInput.value = randomSentence;
+            charCounter.textContent = `${randomSentence.length} / 250`;
             resetAll();
             fetchAndDisplayIPA();
         }
@@ -1031,19 +1060,33 @@
 
         // Initial setup
         function init() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            let savedTheme = 'light';
+            try {
+                savedTheme = localStorage.getItem('theme') || 'light';
+            } catch (e) {
+                console.warn("Could not access localStorage. Defaulting to light theme.");
+            }
             applyTheme(savedTheme);
             
             themeToggle.addEventListener('click', () => {
                 const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                localStorage.setItem('theme', newTheme);
+                try {
+                    localStorage.setItem('theme', newTheme);
+                } catch(e) {
+                    console.warn("Could not save theme to localStorage.");
+                }
                 applyTheme(newTheme);
             });
 
             accentSelect.value = 'British English';
 
-            textInput.addEventListener('input', resetAll);
+            textInput.addEventListener('input', () => {
+                const currentLength = textInput.value.length;
+                const maxLength = textInput.getAttribute('maxlength');
+                charCounter.textContent = `${currentLength} / ${maxLength}`;
+                resetAll();
+            });
             accentSelect.addEventListener('change', () => {
                 if (textInput.value.trim()) {
                     resetAll();
@@ -1051,7 +1094,8 @@
                 }
             });
             transcribeBtn.addEventListener('click', fetchAndDisplayIPA);
-            listenBtn.addEventListener('click', handleListen);
+            listenNaturalBtn.addEventListener('click', (e) => handleListen('natural', e.currentTarget));
+            listenClearBtn.addEventListener('click', (e) => handleListen('clear', e.currentTarget));
             recordBtn.addEventListener('click', handleRecord);
             listenAgainBtn.addEventListener('click', handleListenAgain);
             showMoreBtn.addEventListener('click', toggleAdvancedAnalysis);
